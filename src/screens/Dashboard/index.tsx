@@ -1,55 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Alert } from "react-native";
+import { TouchableOpacity,TouchableNativeFeedback, TouchableHighlight } from 'react-native-gesture-handler';
 import { Header } from '../../components/Header';
 import { HighlightCard } from '../../components/HighlightCard';
-
+import { Modular } from '../../components/Modular';
+import uuid from 'react-native-uuid';
+import theme from '../../global/styles/theme';
+import {ParkData} from '../../global/scripts/apis';
+import {getDBAllPlaces} from '../../global/scripts/database';
 import {
   Container,
   HighlightCards
 } from './styles'
 
 
-interface ParkData {
-  id: string;
-  type: 'open' | 'closed' | 'empty';
-  title : string;
-  amount : string;
-  lastTransaction : string;
-}
-
-
 export function Dashboard({ navigation }){
-  
-  
-    const data = {
-        id: String(new Date().getTime()),
-        type : 'open',
-        title : '2.5 Km de distancia',
-        amount : 'Golden Square Shopping',
-        lastTransaction : '10 vagas disponíves'
-    } as ParkData
-    
-    const data1 = {
-        id: String(new Date().getTime()),
-        type : 'closed',
-        title : '14.5 Km de distancia',
-        amount : 'Termomecanica',
-        lastTransaction : 'Estabelecimento Fechado'
-    } as ParkData
-    
-    const data2 = {
-        id: String(new Date().getTime()),
-        type : 'empty',
-        title : '3.5 Km de distancia',
-        amount : 'Shopping Metropole',
-        lastTransaction : 'Evento Encerrado'
-    } as ParkData
 
-  const [allParks, setAllParks] = useState<ParkData[]>([data, data1, data2]);
-
-  function handleNavigation(){
-    navigation.navigate("Reserve");
+  function handleNavigation(val : ParkData){
+    navigation.navigate("Reserve", val);
   }
+  const getDataPlaces = async function(){
+    return getDBAllPlaces();
+  }
+  const [allParks, setAllParks] = useState<ParkData[]>([]);
+  let getData = true;
+    if(getData){
+      getData = false;
+      //getDataPlaces().then(function(value){
+      //  setAllParks(value);
+      //  console.log(value);
+      //}).catch(function(value){
+//
+      //});
+    }
 
   return (
     <Container>
@@ -57,17 +40,19 @@ export function Dashboard({ navigation }){
       <HighlightCards>
         {
           allParks.map(val => (
-              <TouchableOpacity onPress={handleNavigation} >
+              <TouchableHighlight key={val.id}  onPress={() => handleNavigation(val)}>
                 <HighlightCard
+                  id={val.id}
                   type={val.type}
                   title={val.title}
                   amount={val.amount}
-                  lastTransaction={val.lastTransaction}
+                  quantitySpots={val.quantitySpots}
                 />
-              </TouchableOpacity>         
+              </TouchableHighlight>         
           ))
         }
       </HighlightCards>   
+      <Modular/>
     </Container>
   )
 }

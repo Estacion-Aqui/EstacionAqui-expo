@@ -1,4 +1,5 @@
 import React from 'react';
+import {ParkData} from '../../global/scripts/apis';
 
 import {
   Container,
@@ -12,20 +13,20 @@ import {
 } from './styles';
 
 
-export function TransactionCard(){
+export function TransactionCard(pkData : ParkData){
   return (
     <Container>
       <Title>
-        2.5 Km de distancia
+        {pkData.title}
       </Title>
 
       <Amount >
-        Golden Square Shopping
+        {pkData.amount}
       </Amount>
 
       <Footer>
         <Date>
-          10 Vagas
+          {pkData.quantitySpots}
         </Date>
       </Footer>
     </Container>

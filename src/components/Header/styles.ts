@@ -13,7 +13,7 @@ export const Container = styled.View`
 
 export const HeaderStyle = styled.View`
   width: 100%;
-  height: ${RFPercentage(25)}px;
+  height: ${RFPercentage(20)}px;
 
   background-color: ${({ theme }) => theme.colors.primary};
 
@@ -26,7 +26,7 @@ export const UserWrapper = styled.View`
     width: 100%;
     
     padding: 0 24px;
-    margin-top: ${getStatusBarHeight() + RFValue(5)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(0)}px;
 
     flex-direction: row;
     justify-content: space-between;
@@ -46,7 +46,7 @@ export const Photo = styled.Image`
 `;
 
 export const User = styled.View`
-  margin-left: 17px;
+  margin-left: 12px;
 `;
 
 export const UserGreeting = styled.Text`
@@ -66,32 +66,6 @@ export const UserName = styled.Text`
 export const Icon = styled(Feather)`
   color: ${({ theme }) => theme.colors.attention};
   font-size: ${RFValue(24)}px;
-`;
-
-export const ReserveSpotAction = styled.TouchableHighlight``;
-
-export const HighlightCards = styled.ScrollView.attrs({
-  showsVerticalScrollIndicator: false,
-  contentContainerStyle: { paddingHorizontal: 24 }
-})`
-  height: 82%;
-
-  position: absolute;
-  margin-top: ${RFPercentage(17)}px;
-`;
-
-export const Transactions = styled.View`
-  flex: 1%;
-  padding: 0 24px;
-
-  margin-top: ${RFPercentage(12)}px;
-`;
-
-export const Title = styled.Text`
-  font-size: ${RFValue(18)}px;
-  font-family: ${({ theme }) => theme.fonts.regular};
-
-  margin-bottom: 16px;
 `;
 
 export const LogoutButton = styled(BorderlessButton)``;

@@ -9,6 +9,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { Dashboard } from '../screens/Dashboard';
 import { ReserveSpot } from '../screens/ReserveSpot';
+import { WaitingSpot } from '../screens/WaitingSpot';
+import { CurrentSpot } from '../screens/CurrentSpot';
+import { OldTravel } from '../screens/OldTravel';
+import { Setup } from '../screens/Setup';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -86,6 +90,8 @@ const MainStackNavigator = () => {
     <Stack.Navigator screenOptions={screenOptionStyle}>
       <Stack.Screen name="Home" component={Dashboard} />
       <Stack.Screen name="Reserve" component={ReserveSpot} />
+      <Stack.Screen name="WaitingSpot" component={WaitingSpot} />
+      <Stack.Screen name="CurrentSpot" component={CurrentSpot} />
     </Stack.Navigator>
   );
 }
@@ -93,7 +99,7 @@ const MainStackNavigator = () => {
 const OldTravelNavigator = () => {
   return (
     <Stack.Navigator screenOptions={screenOptionStyle}>
-      <Stack.Screen name="Reserve" component={ReserveSpot} />
+      <Stack.Screen name="OldTravel" component={OldTravel} />
     </Stack.Navigator>
   );
 }
@@ -101,7 +107,7 @@ const OldTravelNavigator = () => {
 const ConfigNavigator = () => {
   return (
     <Stack.Navigator screenOptions={screenOptionStyle}>
-      <Stack.Screen name="Reserve" component={ReserveSpot} />
+      <Stack.Screen name="Setup" component={Setup} />
     </Stack.Navigator>
   );
 }

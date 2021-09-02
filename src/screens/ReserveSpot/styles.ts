@@ -12,8 +12,8 @@ export const ContentView = styled.View.attrs({
   width: 100%;
   justify-content: center;
   align-items: center;
-  padding: 0;
+  padding: 0; 
 
   position: absolute;
-  margin-top: ${RFPercentage(17)}px;
+  margin-top: ${RFPercentage(15)}px;
 `;

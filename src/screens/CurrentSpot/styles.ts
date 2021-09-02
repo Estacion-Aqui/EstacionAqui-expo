@@ -23,8 +23,8 @@ export const ContentView = styled.View.attrs({
 
 export const Text = styled.Text`
   color: ${({ theme }) => theme.colors.primary_select};
-  margin-top:${RFValue(0)}px; 
-  font-size: ${RFValue(14)}px;
+  margin-top:${RFValue(1)}px; 
+  font-size: ${RFValue(22)}px;
   width:  ${RFValue(280)}px;
   text-align: center;
   font-family: ${({ theme }) => theme.fonts.bold};

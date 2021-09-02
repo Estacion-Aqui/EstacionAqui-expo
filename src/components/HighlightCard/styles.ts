@@ -10,10 +10,9 @@ export const Container = styled.TouchableOpacity<TypeProps>`
   background-color: ${({ theme, type }) =>
   type === 'empty' ? theme.colors.secondary_light :  theme.colors.shape};
   width: ${RFValue(300)}px;
-  border-radius: 5px;
-  padding: ${RFValue(15)}px ${RFValue(25)}px;
-  margin-right: 16px;
-  margin-bottom: 20px;
+  border-radius: 15px;
+  padding: ${RFValue(15)}px ${RFValue(15)}px;
+  margin-bottom: 25px;
 `;
 
 export const Header = styled.View`
@@ -29,7 +28,7 @@ export const Title = styled.Text<TypeProps>`
 `;
 
 export const Icon = styled(FontAwesome5)<TypeProps>`
-  font-size: ${RFValue(40)}px;
+  font-size: ${RFValue(35)}px;
   ${({ type }) => type === 'open' && css`
     color: ${({ theme }) => theme.colors.success};
   `};
@@ -45,15 +44,15 @@ export const Footer = styled.View``;
 
 export const Amount = styled.Text<TypeProps>`
   font-family: ${({ theme }) => theme.fonts.medium};
-  font-size: ${RFValue(22)}px;
+  font-size: ${RFValue(17)}px;
+  font-weight: bold;
   color: ${({ theme, type }) =>
   type === 'empty' ? theme.colors.shape :  theme.colors.text_dark};
-  margin-top: 8px;
 `;
 
 export const LastTransaction = styled.Text<TypeProps>`
   font-family: ${({ theme }) => theme.fonts.regular};
-  font-size: ${RFValue(12)}px;
+  font-size: ${RFValue(13)}px;
   color: ${({ theme, type }) =>
   type === 'empty' ? theme.colors.shape :  theme.colors.text};
 `;

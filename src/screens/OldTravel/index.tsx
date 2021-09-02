@@ -2,13 +2,12 @@ import React from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Modular } from '../../components/Modular';
 import { TransactionCard } from '../../components/TransactionCard';
+import * as Progress from 'react-native-progress';
 import theme from '../../global/styles/theme';
-import {ParkData} from '../../global/scripts/apis';
 
 import {
     TouchableOpacity,
     TouchableOpacityProps,
-    TouchableHighlight,
     Text,
     View,
     StyleSheet
@@ -21,33 +20,11 @@ import {
 
 import { Header } from '../../components/Header';
 
-export function ReserveSpot({ route, navigation }){
-  
-  
-  const { pkData } = route.params;
-
-  function handleNavigation(val : ParkData){
-    navigation.navigate("WaitingSpot", val);
-  }
+export function OldTravel({ navigation }){
   return (
-    <Container>
+    <Container> 
       <Header></Header>
       <ContentView>
-        <TransactionCard 
-                  id={pkData.id}
-                  type={pkData.type}
-                  title={pkData.title}
-                  amount={pkData.amount}
-                  quantitySpots={pkData.quantitySpots}/>
-        <TouchableHighlight
-        style={styles.button}
-        activeOpacity={0.7}
-        onPress={() => handleNavigation(pkData)}
-        >
-          <Text style={styles.buttonText}>
-              Navegar/Reservar
-          </Text>
-        </TouchableHighlight>
       </ContentView> 
       <Modular/>
     </Container>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 import {
   Container,
@@ -13,9 +14,18 @@ import {
   LogoutButton
 } from './styles'
 
+type NavigationProps = {
+   navigate:(screen:string) => void;
+}
+
 export function Header(){
+  const navigation = useNavigation<NavigationProps>()
+
+  function handleNavigationSetup(){
+    navigation.navigate('Config.');
+  }
   return (
-    <Container>
+    <Container onTouchStart={handleNavigationSetup}>
       <HeaderStyle>
         <UserWrapper>
            <UserInfo>

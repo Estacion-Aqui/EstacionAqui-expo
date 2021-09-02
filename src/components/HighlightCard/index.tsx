@@ -1,4 +1,5 @@
 import React from 'react';
+import {ParkData} from '../../global/scripts/apis';
 
 import {
   Container,
@@ -10,13 +11,6 @@ import {
   LastTransaction,
 } from './styles';
 
-interface Props {
-  type: 'open' | 'closed' | 'empty';
-  title: string;
-  amount: string;
-  lastTransaction: string;
-}
-
 const icon = {
   open: 'parking',
   closed: 'lock',
@@ -24,30 +18,25 @@ const icon = {
 }
 
 
-export function HighlightCard({
-  type,
-  title,
-  amount,
-  lastTransaction
-} : Props){
+export function HighlightCard(pkData : ParkData){
   return (
-    <Container type={type}>
+    <Container type={pkData.type}>
       <Header>
-        <Title type={type}>
-          {title}
+        <Title type={pkData.type}>
+          {pkData.title}
         </Title>
         <Icon
-          name={icon[type]}
-          type={type}
+          name={icon[pkData.type]}
+          type={pkData.type}
         />
       </Header>
 
       <Footer>
-        <Amount type={type}>
-          {amount}
+        <Amount type={pkData.type}>
+          {pkData.amount}
         </Amount>
-        <LastTransaction type={type}>
-          {lastTransaction}
+        <LastTransaction type={pkData.type}>
+          {pkData.quantitySpots}
         </LastTransaction>
       </Footer>
 
