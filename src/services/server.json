@@ -1,0 +1,111 @@
+{
+  "places": [
+    {
+      "id": "1",
+      "type": "open",
+      "title": "2.5 Km de distancia",
+      "amount": "Termomecanica",
+      "quantitySpots": "10 vagas disponíves",
+      "latitude": -23.736241,
+      "longitude": -46.583086
+    },
+    {
+      "id": "2",
+      "type": "closed",
+      "title": "14.5 Km de distancia",
+      "amount": "Termomecanica - Ensino Fundamental",
+      "quantitySpots": "Estabelecimento Fechado",
+      "latitude": -23.68345,
+      "longitude": -46.558028
+    },
+    {
+      "id": "3",
+      "type": "empty",
+      "title": "3.5 Km de distancia",
+      "amount": "Termomecanica - Apresentação da Banda 2021",
+      "quantitySpots": "Evento Encerrado",
+      "latitude": -23.68345,
+      "longitude": -46.558028
+    },
+    {
+      "id": "4",
+      "type": "empty",
+      "title": "3.5 Km de distancia",
+      "amount": "Shopping Metropole",
+      "quantitySpots": "Evento Encerrado",
+      "latitude": -23.68345,
+      "longitude": -46.558028
+    },
+    {
+      "id": "5",
+      "type": "empty",
+      "title": "3.5 Km de distancia",
+      "amount": "Shopping Metropole",
+      "quantitySpots": "Evento Encerrado",
+      "latitude": -23.68345,
+      "longitude": -46.558028
+    }
+  ],
+  "travelData": [
+    {
+      "id": "1",
+      "spotId": "A22",
+      "estabId": "1",
+      "day": "23/09/2021"
+    },
+    {
+      "id": "2",
+      "spotId": "A21",
+      "estabId": "1",
+      "day": "22/09/2021"
+    },
+    {
+      "id": "3",
+      "spotId": "A21",
+      "estabId": "1",
+      "day": "20/09/2021"
+    },
+    {
+      "id": "4",
+      "spotId": "A22",
+      "estabId": "2",
+      "day": "19/09/2021"
+    }
+  ],
+  "reserveSpot": {
+    "id": "7",
+    "spotId": "A22"
+  },
+  "updateData": {
+    "id": "10",
+    "name": "Teixeira",
+    "car": "Audi A3",
+    "email": "gabrielteixeir137@gmail.com"
+  },
+  "insertData": {
+    "id": "10",
+    "name": "Teixeira",
+    "car": "Audi A3",
+    "email": "gabrielteixeir137@gmail.com"
+  },
+  "checkLogin": {
+    "id": "10",
+    "name": "Teixeira",
+    "car": "Audi A3",
+    "email": "gabrielteixeir137@gmail.com"
+  },
+  "confirmSpot": {
+    "parkId": "1",
+    "spotId": "A22",
+    "usId": ""
+  },
+  "cancelSpot": {
+    "parkId": "1",
+    "usId": ""
+  },
+  "checkStatusSpot": {
+    "parkId": "1",
+    "spotId": "A22",
+    "usId": ""
+  }
+}
