@@ -23,3 +23,9 @@ export const Transactions = styled.View`
 
   margin-top: ${RFPercentage(12)}px;
 `;
+
+export const LoadContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
