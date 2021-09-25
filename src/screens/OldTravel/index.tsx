@@ -1,9 +1,15 @@
-import React from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native';
+import { useTheme } from 'styled-components';
 import { Modular } from '../../components/Modular';
-import { TransactionCard } from '../../components/TransactionCard';
-import * as Progress from 'react-native-progress';
+import {  TouchableHighlight } from 'react-native-gesture-handler';
+import {TravelData} from '../../global/scripts/apis';
+import {getDBLastTravelAllPlaces, getDBEstabData} from '../../global/scripts/database';
 import theme from '../../global/styles/theme';
+
+import { HighlightCard } from '../../components/HighlightCard';
 
 import {
     TouchableOpacity,
@@ -15,18 +21,71 @@ import {
 
 import {
   Container,
-  ContentView
+  HighlightCards,
+  ContentView,
+  LoadContainer
 } from './styles'
 
 import { Header } from '../../components/Header';
 
 export function OldTravel({ navigation }){
+  const [isLoading, setIsLoading] = useState(true);
+
+  function handleNavigation(val : TravelData){  
+    debugger;
+    navigation.navigate("Reserve", val);
+  }
+
+  const theme = useTheme();
+
+  const [allParks, setTravel] = useState<TravelData[]>([]);
+  function getData(){
+    setIsLoading(true);
+    getDBLastTravelAllPlaces().then(function(result){
+      setTravel(result);
+      setIsLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    getData()
+  },[]));
   return (
-    <Container> 
-      <Header></Header>
-      <ContentView>
-      </ContentView> 
-      <Modular/>
+    <Container>
+      {
+        isLoading ?
+        <LoadContainer>
+          <ActivityIndicator
+            color={theme.colors.primary}
+            size="large"
+          />
+        </LoadContainer> :
+        <>
+        <Header></Header>
+        <HighlightCards>
+          {
+            allParks.map(val => (
+                <TouchableHighlight key={val.id}>
+                  <HighlightCard
+                    id={val.estabId}
+                    type={'closed'}
+                    title={val.day}
+                    amount={''}
+                    quantitySpots={'Vaga Estacionada: ' +val.spotId}
+                    latitude={0}
+                    longitude={0}
+                  />
+                </TouchableHighlight>         
+            ))
+          }
+        </HighlightCards>   
+        <Modular/>
+        </>
+      }
     </Container>
   )
 }

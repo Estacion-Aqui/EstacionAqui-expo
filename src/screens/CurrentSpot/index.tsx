@@ -26,20 +26,6 @@ import { Header } from '../../components/Header';
 
 export function CurrentSpot({ route, navigation }){
   
-const MySwal = withReactContent(Swal)
-
-function teste(){
-  MySwal.fire({
-    title: <p>Hello World</p>,
-    footer: 'Copyright 2018',
-    didOpen: () => {
-      MySwal.clickConfirm()
-    }
-  }).then(() => {
-    return MySwal.fire(<p>Shorthand works too</p>)
-  })
-}
-
   let stateRegion ={
       latitude: -23.683450,
       longitude: -46.558028,
@@ -47,12 +33,18 @@ function teste(){
       longitudeDelta: 0.0421,
     };
 
-    const { pkData } = route.params;
+    const  pkData  = route.params.pkData;
+    const  trlData  = route.params.trlData;
 
   function handleBack(){
     // navigation.goBack();
     navigation.navigate("CurrentSpot");
   }
+  
+          
+    /* confirmSpot(pkData.id, trlData.spotId, '').then(function(item){
+      navigation.navigate("CurrentSpot", pkData);
+    });*/
   return (
     <Container>
       <Header></Header>
@@ -62,7 +54,9 @@ function teste(){
                   type={pkData.type}
                   title={pkData.title}
                   amount={pkData.amount}
-                  quantitySpots={pkData.quantitySpots}/>
+                  quantitySpots={pkData.quantitySpots}
+                  latitude={pkData.latitude}
+                  longitude={pkData.longitude}/>
         <Text>Encontramos uma Vaga!!!</Text>
         <View style={styles.viewSpots}>
           <View style={styles.viewSpot}>

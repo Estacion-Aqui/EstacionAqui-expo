@@ -18,3 +18,19 @@ export const ContentView = styled.View.attrs({
   position: absolute; 
   margin-top: ${RFPercentage(15)}px;
 `;
+
+export const HighlightCards = styled.ScrollView.attrs({
+  showsVerticalScrollIndicator: false,
+  contentContainerStyle: { paddingHorizontal: 24 }
+})`
+  height: 84%;
+
+  position: absolute;
+  margin-top: ${RFPercentage(15)}px;
+`;
+
+export const LoadContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
