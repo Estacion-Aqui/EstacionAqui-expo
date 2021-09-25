@@ -1,58 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { Alert } from "react-native";
-import { TouchableOpacity,TouchableNativeFeedback, TouchableHighlight } from 'react-native-gesture-handler';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from 'styled-components';
+import { ActivityIndicator, Alert  } from 'react-native';
+import {  TouchableHighlight } from 'react-native-gesture-handler';
 import { Header } from '../../components/Header';
 import { HighlightCard } from '../../components/HighlightCard';
 import { Modular } from '../../components/Modular';
-import uuid from 'react-native-uuid';
-import theme from '../../global/styles/theme';
 import {ParkData} from '../../global/scripts/apis';
 import {getDBAllPlaces} from '../../global/scripts/database';
 import {
   Container,
-  HighlightCards
+  HighlightCards,
+  LoadContainer
 } from './styles'
 
 
 export function Dashboard({ navigation }){
+  const [isLoading, setIsLoading] = useState(true);
 
-  function handleNavigation(val : ParkData){
-    navigation.navigate("Reserve", val);
-  }
-  const getDataPlaces = async function(){
-    return getDBAllPlaces();
-  }
-  const [allParks, setAllParks] = useState<ParkData[]>([]);
-  let getData = true;
-    if(getData){
-      getData = false;
-      //getDataPlaces().then(function(value){
-      //  setAllParks(value);
-      //  console.log(value);
-      //}).catch(function(value){
-//
-      //});
+  function handleNavigation(val : ParkData){  
+    if(val.type == 'open'){
+      navigation.navigate("Reserve", val);
+    }else{
+      Alert.alert(
+      "Estabelecimento Fechado",
+      "No momento não é possivel reservar uma vaga para este Estabelecimento",
+      [
+        { text: "OK", onPress: () => console.log("OK Pressed") }
+      ]
+    );
     }
+  }
+
+  const theme = useTheme();
+
+  const [allParks, setAllParks] = useState<ParkData[]>([]);
+
+  function getData(){
+    getDBAllPlaces().then(function(result){
+      setAllParks(result);
+      setIsLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    getData()
+  },[]));
 
   return (
     <Container>
-      <Header></Header>
-      <HighlightCards>
-        {
-          allParks.map(val => (
-              <TouchableHighlight key={val.id}  onPress={() => handleNavigation(val)}>
-                <HighlightCard
-                  id={val.id}
-                  type={val.type}
-                  title={val.title}
-                  amount={val.amount}
-                  quantitySpots={val.quantitySpots}
-                />
-              </TouchableHighlight>         
-          ))
-        }
-      </HighlightCards>   
-      <Modular/>
+      {
+        isLoading ?
+        <LoadContainer>
+          <ActivityIndicator
+            color={theme.colors.primary}
+            size="large"
+          />
+        </LoadContainer> :
+        <>
+        <Header></Header>
+        <HighlightCards>
+          {
+            allParks.map(val => (
+                <TouchableHighlight key={val.id}  onPress={() => handleNavigation(val)}>
+                  <HighlightCard
+                    id={val.id}
+                    type={val.type}
+                    title={val.title}
+                    amount={val.amount}
+                    quantitySpots={val.quantitySpots}
+                    latitude={val.latitude}
+                    longitude={val.longitude}
+                  />
+                </TouchableHighlight>         
+            ))
+          }
+        </HighlightCards>   
+        <Modular/>
+        </>
+      }
     </Container>
   )
 }
