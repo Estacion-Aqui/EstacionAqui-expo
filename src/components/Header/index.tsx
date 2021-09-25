@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import {TravelData, ParkData, UserData} from '../../global/scripts/apis';
+import {getDBEstabData, checkUserData} from '../../global/scripts/database';
+
 import { useNavigation } from '@react-navigation/native';
 
 import {
@@ -24,17 +28,36 @@ export function Header(){
   function handleNavigationSetup(){
     navigation.navigate('Config.');
   }
+
+  const [usData, setData] = useState<UserData>();
+  function getData(){
+    checkUserData().then(function(result){
+      if(result != null)
+        setData(result);
+      else
+        setData(undefined);
+    });
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    getData()
+  },[]));
+
   return (
     <Container onTouchStart={handleNavigationSetup}>
       <HeaderStyle>
         <UserWrapper>
            <UserInfo>
             <Photo
-              source={{ uri: 'https://avatars.githubusercontent.com/GTeixeirinha7?v=4'}}
+              source={{ uri: 'https://www.pinpng.com/pngs/m/341-3415688_no-avatar-png-transparent-png.png'}}
             />
             <User>
               <UserGreeting>Olá,</UserGreeting>
-              <UserName>Teixeira</UserName>
+              <UserName>{usData == null ? 'Visitante' : usData.name}</UserName>
             </User>
           </UserInfo>
           <LogoutButton onPress={() => {}}>
