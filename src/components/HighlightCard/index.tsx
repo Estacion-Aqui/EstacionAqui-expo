@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {ParkData} from '../../global/scripts/apis';
+import {getDBEstabData} from '../../global/scripts/database';
 
 import {
   Container,
@@ -19,6 +21,26 @@ const icon = {
 
 
 export function HighlightCard(pkData : ParkData){
+
+  const [title, settitle] = useState<string>('');
+  
+  function getData(){
+    if(pkData.amount != ''){
+      settitle(pkData.amount);
+    }else{
+      getDBEstabData(pkData.id).then(function(result){
+        settitle(result.amount);
+      });
+    }
+  }
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    getData()
+  },[]));
+
   return (
     <Container type={pkData.type}>
       <Header>
@@ -33,7 +55,7 @@ export function HighlightCard(pkData : ParkData){
 
       <Footer>
         <Amount type={pkData.type}>
-          {pkData.amount}
+          {title}
         </Amount>
         <LastTransaction type={pkData.type}>
           {pkData.quantitySpots}
