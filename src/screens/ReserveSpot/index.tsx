@@ -1,10 +1,13 @@
-import React, {useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Modular } from '../../components/Modular';
 import { ActivityIndicator, Alert  } from 'react-native';
 import { TransactionCard } from '../../components/TransactionCard';
 import theme from '../../global/styles/theme';
-import {reserveSpot, ParkData, lastTravels, TravelData, UserData} from '../../global/scripts/apis';
+import {reserveSpot, ParkData, lastTravels, TravelData, UserData, getQuantitySpots} from '../../global/scripts/apis';
+import {getDistanceParkData} from '../../global/scripts/utils';
+import {setReserveSpot} from '../../global/scripts/database';
 
 import {
     TouchableOpacity,
@@ -29,10 +32,35 @@ export function ReserveSpot({ route, navigation }){
   
   const pkData = route.params;
 
+  var intervalIdData = 0 as number;
   function handleNavigation(val : ParkData){    
     setIsLoading(true);
-      navigation.navigate("WaitingSpot", {pkData: val});
+    window.clearInterval(intervalIdData);
+    intervalIdData = 0;
+    setReserveSpot(pkData);
+    navigation.navigate("WaitingSpot", {pkData: val});
   }
+
+  const getLocation = async (result : ParkData) => {
+    pkData.title = await getDistanceParkData(result);
+    pkData.quantitySpots = await getQuantitySpots(result);
+  }
+
+  function setIntervalLocation(){
+    return window.setInterval(function(){
+      getLocation(pkData);
+    }, 10000)
+  }
+
+  useEffect(() => {
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+  },[]));
   return (
     <Container>
       {
@@ -50,7 +78,7 @@ export function ReserveSpot({ route, navigation }){
                       id={pkData.id}
                       type={pkData.type}
                       title={pkData.title}
-                      amount={pkData.amount}
+                      distance={pkData.distance}
                       quantitySpots={pkData.quantitySpots}
                       latitude={pkData.latitude}
                       longitude={pkData.longitude}/>

@@ -6,16 +6,17 @@ var token = '';
 const api_key = 'SmartParkingnmdtc78b87trfio8ufy';
 
 const api = axios.create({
-    baseURL : 'http://192.168.0.147:3333',
+    baseURL : 'https://estacion-aqui.herokuapp.com/api/v1',
     headers: {Authorization: `Bearer ${token}` }
 });
 
 const api_oauth = axios.create({
-    baseURL : 'http://192.168.0.147:3333'
+    baseURL : 'https://estacion-aqui.herokuapp.com/api/v1'
 });
 
 export interface TravelData {
   id: string;
+  spotSector : string;
   spotId : string;
   estabId : string;
   day : string;
@@ -27,7 +28,7 @@ export interface ParkData {
   id: string;
   type: 'open' | 'closed' | 'empty';
   title : string;
-  amount : string;
+  distance : string;
   quantitySpots : string;
   latitude : number;   
   longitude : number;
@@ -36,6 +37,7 @@ export interface UserData {
   id: string;
   name : string;
   car : string;
+  plate : string;
   password : string;
   email : string;
 }
@@ -63,6 +65,9 @@ export async function getAPIAllPlaces(pkData :ParkData[]){
             var respData = (resp.data);
             
             respData.forEach(function(item : ParkData){
+                
+                item.latitude = parseFloat( item.latitude );
+                item.longitude = parseFloat( item.longitude );
                 respMap.set(item.id, item);
                 pkData.push(item);
             }, {respMap})
@@ -71,10 +76,10 @@ export async function getAPIAllPlaces(pkData :ParkData[]){
                 if(respMap.has(item.id)){
                     item.type          = respMap.get(item.id).type;
                     item.title         = respMap.get(item.id).title;
-                    item.amount        = respMap.get(item.id).amount;
-                    item.quantitySpots = respMap.get(item.id).quantitySpots;
-                    item.latitude = respMap.get(item.id).latitude;
-                    item.longitude = respMap.get(item.id).longitude;
+                    // item.distance        = respMap.get(item.id).amount;
+                    item.quantitySpots = 'Carregando Vagas!!!';
+                    item.latitude = parseFloat(respMap.get(item.id).latitude);
+                    item.longitude = parseFloat(respMap.get(item.id).longitude);
                 }else{
                     item.type = 'closed';
                 }
@@ -120,7 +125,7 @@ export async function sendUserData(us : UserData){
     }   
     return null;
 }
-export async function reserveSpot(parkId : string, usId : String){
+export async function reserveSpot(parkId : string){
     var respData : TravelData;
 
 
@@ -131,6 +136,7 @@ export async function reserveSpot(parkId : string, usId : String){
     respData ={
         id : '',
         spotId : '',
+        spotSector : '',
         estabId: parkId,
         day : ( date + '/' + month + '/' + year),
         cancelled: false,
@@ -138,34 +144,61 @@ export async function reserveSpot(parkId : string, usId : String){
     }
     try {
         // var resp = await api.get(`/reserveSpot?user=${usId}&parkId=${parkId}`);
-        var resp = await api.get(`/reserveSpot`);
-        respData.spotId = resp.data.spotId;
-        respData.id = resp.data.id;
+        var resp = await api.get(`/spots/free/${parkId}`);
+
+        // var respSector = await api.get(`/sectors/${resp.data.sector}`);
+
+        respData.id = resp.data?.id;
+        respData.spotId = resp.data.message ? null : resp.data?.title;
+        respData.spotSector = '23';//respSector.data?.code;
         return respData;
     } catch (error) {
         console.log(error);
     }   
     return respData;
 }
-export async function confirmSpot(parkId : String, spotId : String, usId : String){
-    var data = {parkId: parkId, spotId: spotId, usId: usId};
-    return await spotData(data, '/confirmSpot');
+export async function confirmSpot( spotId : String){
+    return await spotData(`/spots/confirmSpot/${spotId}`);
 }
-export async function cancelSpot(parkId : String, usId : String){
-    var data = {parkId: parkId, usId: usId};
-    return await spotData(data, '/cancelSpot');
+export async function cancelSpot(spotId : String){
+    return await spotData(`/spots/cancelSpot/${spotId}`);
 }
-export async function checkSpot(parkId : String, spotId : String, usId : String){
-    var data = {parkId: parkId, spotId: spotId, usId: usId};
-    return await spotData(data, '/checkStatusSpot');
-}
-export async function spotData(jsonzada : Object, endpoint : string){
+export async function checkSpot(spotId : String){
     try {
-        var resp  = await api.post(endpoint, jsonzada);
+        var resp  = await api.get(`/spots/${spotId}`);
         console.log('resp'+resp);
         return resp.data;
     } catch (error) {
         console.log(error);
     }   
     return null;
+}
+export async function spotData(endpoint : string){
+    try {
+        var resp  = await api.post(endpoint);
+        console.log('resp'+resp);
+        return resp.data;
+    } catch (error) {
+        console.log(error);
+    }   
+    return null;
+}
+
+export async function getQuantitySpots(pks : ParkData){
+    var resultData = 'Não há vagas!!';
+    try {
+        var resp  = await api.get(`/spots/place/${pks.id}`);
+        console.log('resp'+resp);
+        let qtdSpots = 0;
+        resp.data.forEach(function(item){
+            if(item.status){
+                qtdSpots++;
+            }
+        });    
+        if(qtdSpots)     
+            return `${qtdSpots} vagas disponíveis`;
+    } catch (error) {
+        console.log(error);
+    }  
+    return resultData;
 }

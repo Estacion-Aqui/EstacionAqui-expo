@@ -43,6 +43,7 @@ export function Setup({ navigation }){
   const [usDataCar, setCar] = useState<string>();
   const [usDataEmail, setEmail] = useState<string>();
   const [usDataPassword, setPassword] = useState<string>();
+  const [usDataPlate, setPlate] = useState<string>();
   function getData(){
     checkUserData().then(function(result){
       if(result != null)
@@ -64,12 +65,12 @@ export function Setup({ navigation }){
       { text: "OK", onPress: () => console.log("OK Pressed") }
     ]
   );
-  setData({id : item.id, name : item.name,email : item.email,car : item.car,password : item.password});
+  setData({id : item.id, name : item.name,email : item.email,car : item.car,password : item.password, plate : item.plate});
 
  }
  function checkData(){
-   if(usDataName && usDataCar && usDataEmail && usDataPassword){
-    setUserData('', usDataName, usDataCar, usDataEmail, usDataPassword).then(function(item){
+   if(usDataName && usDataCar && usDataEmail && usDataPassword && usDataPlate){
+    setUserData('', usDataName, usDataCar, usDataEmail, usDataPassword, usDataPlate).then(function(item){
       if(!item.id){
         Alert.alert(
           "Usuario Invalido",
@@ -157,6 +158,13 @@ export function Setup({ navigation }){
             placeholder="Carro"
             onChangeText={text => setCar(text)}
             defaultValue={usData == null ? "" : usData.car}
+            style={styles.inputs}
+            keyboardType="default"
+          />
+          <TextInput
+            placeholder="Placa do Carro"
+            onChangeText={text => setPlate(text)}
+            defaultValue={usData == null ? "" : usData.plate}
             style={styles.inputs}
             keyboardType="default"
           />

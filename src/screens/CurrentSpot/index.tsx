@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { TransactionCard } from '../../components/TransactionCard';
 import { Modular } from '../../components/Modular';
-import {ParkData} from '../../global/scripts/apis';
-
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
+import { ActivityIndicator, Alert  } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import {ParkData, TravelData, reserveSpot, getQuantitySpots, checkSpot, UserData} from '../../global/scripts/apis';
+import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin} from '../../global/scripts/database';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
@@ -26,25 +26,84 @@ import { Header } from '../../components/Header';
 
 export function CurrentSpot({ route, navigation }){
   
-  let stateRegion ={
-      latitude: -23.683450,
-      longitude: -46.558028,
-      latitudeDelta: 0.0222,
-      longitudeDelta: 0.0421,
-    };
+  const [pkData, setPkData] = useState<ParkData>(route.params.pkData);
+  const [trlData, setTrlData] = useState<TravelData>(route.params.trlData);
+  const [usData, setUsData] = useState<UserData>();
 
-    const  pkData  = route.params.pkData;
-    const  trlData  = route.params.trlData;
+  var intervalIdData = 0 as number;
+  const checkStatusSpot = async (result : TravelData) => {
+      checkSpot(result.id).then(function(item){
+        if(item.status) return;
 
-  function handleBack(){
-    // navigation.goBack();
-    navigation.navigate("CurrentSpot");
+        if(usData != null && item.plate == usData?.plate){
+          handleNavigation();
+        }else{
+          handleBack();
+        }
+      });
   }
+  function handleBack(){
+      reserveSpot(pkData.id).then(function(result){
+        if(result.spotId != null){
+          Alert.alert(
+            "Nova vaga encontrada!!",
+            "Encontramos uma nova vaga para voce",
+            [ 
+              { text: "OK", onPress: () => console.log("Home") }
+            ]
+          );
+          setTrlData(result);
+        }else{
+          window.clearInterval(intervalIdData);
+          Alert.alert(
+            "Estacionamento Lotado!!",
+            "Temos muitas pessoas utilizando o aplicativo ao mesmo tempo.... e todas as vagas acabaram, entre em contato com um agente local!",
+            [ 
+              { text: "OK", onPress: () => navigation.navigate("Home") }
+            ]
+          );
+        }
+      });
+  }
+  function handleNavigation(){  
+    window.clearInterval(intervalIdData);
+    intervalIdData = 0;
+    navigation.navigate("EndFlow", {pkData: pkData});
+  }
+  const getLocation = async (result : ParkData) => {
+    pkData.quantitySpots = await getQuantitySpots(result);
+  }
+
+  function setIntervalLocation(){
+    return window.setInterval(function(){
+      getLocation(pkData);
+      checkStatusSpot(trlData);
+    }, 10000)
+  }
+  useFocusEffect(useCallback(() => {
+    
+    checkUserData().then(function(us){
+      if(us != null)
+        setUsData(us);
+    });
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+  },[]));
+
+  useEffect(() => {
+    checkUserData().then(function(us){
+      if(us != null)
+        setUsData(us);
+    });
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+  }, []);
   
           
     /* confirmSpot(pkData.id, trlData.spotId, '').then(function(item){
       navigation.navigate("CurrentSpot", pkData);
     });*/
+    //validar placa estacionada com a placa existente no bando do APP
   return (
     <Container>
       <Header></Header>
@@ -53,7 +112,7 @@ export function CurrentSpot({ route, navigation }){
                   id={pkData.id}
                   type={pkData.type}
                   title={pkData.title}
-                  amount={pkData.amount}
+                  distance={pkData.distance}
                   quantitySpots={pkData.quantitySpots}
                   latitude={pkData.latitude}
                   longitude={pkData.longitude}/>
@@ -66,7 +125,7 @@ export function CurrentSpot({ route, navigation }){
             activeOpacity={0.7}
             >
               <Text style={styles.spotTextInside}>
-                  A1
+                  {trlData.spotSector ?  trlData.spotSector : ' - '}
               </Text>
             </TouchableOpacity>
           </View>
@@ -77,19 +136,29 @@ export function CurrentSpot({ route, navigation }){
             activeOpacity={0.7}
             >
               <Text style={styles.spotTextInside}>
-                  23
+                  {trlData.spotId}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
         
+        {
+          usData == null ? 
+        <>
         <Button
+          onPress = {() => handleNavigation()}
           buttonStyle={styles.buttonStyle}
           titleStyle={styles.buttonText}
           title="Estacionei!!"
         />
 
+        </>
+          :
+        <>
+        </>
+        }
         <Button
+          onPress = {() => handleBack()}
           buttonStyle={styles.buttonAttentionStyle}
           titleStyle={styles.buttonText}
           title="A vaga está ocupada..."

@@ -11,6 +11,7 @@ import { Dashboard } from '../screens/Dashboard';
 import { ReserveSpot } from '../screens/ReserveSpot';
 import { WaitingSpot } from '../screens/WaitingSpot';
 import { CurrentSpot } from '../screens/CurrentSpot';
+import { EndFlow } from '../screens/EndFlow';
 import { OldTravel } from '../screens/OldTravel';
 import { Setup } from '../screens/Setup';
 
@@ -92,6 +93,7 @@ const MainStackNavigator = () => {
       <Stack.Screen name="Reserve" component={ReserveSpot} />
       <Stack.Screen name="WaitingSpot" component={WaitingSpot} />
       <Stack.Screen name="CurrentSpot" component={CurrentSpot} />
+      <Stack.Screen name="EndFlow" component={EndFlow} />
     </Stack.Navigator>
   );
 }

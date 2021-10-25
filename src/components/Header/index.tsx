@@ -52,9 +52,9 @@ export function Header(){
       <HeaderStyle>
         <UserWrapper>
            <UserInfo>
-            <Photo
+            {/* <Photo
               source={{ uri: 'https://www.pinpng.com/pngs/m/341-3415688_no-avatar-png-transparent-png.png'}}
-            />
+            /> */}
             <User>
               <UserGreeting>Olá,</UserGreeting>
               <UserName>{usData == null ? 'Visitante' : usData.name}</UserName>

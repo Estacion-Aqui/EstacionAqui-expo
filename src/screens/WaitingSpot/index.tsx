@@ -1,20 +1,22 @@
 import { RFValue } from 'react-native-responsive-fontsize';
 import { TransactionCard } from '../../components/TransactionCard';
 import React, { useCallback, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
 import { ActivityIndicator, Alert  } from 'react-native';
 import { Modular } from '../../components/Modular';
 
+
+import BackgroundFetch from 'react-native-background-fetch';
+import PushNotification from 'react-native-push-notification';
+
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
 import MapView, { Marker } from 'react-native-maps';
-import {checkUserData} from '../../global/scripts/database';
+import {checkUserData, removeReserveSpot} from '../../global/scripts/database';
+import {getDistanceParkData, getDistParkData} from '../../global/scripts/utils';
 
-import {reserveSpot, ParkData, confirmSpot, lastTravels, TravelData, UserData, cancelSpot} from '../../global/scripts/apis';
-
-// import {getDistance, getPreciseDistance} from 'geolib';
-// import Geolocation from '@react-native-community/geolocation';
-
+import {reserveSpot, ParkData, confirmSpot, lastTravels, TravelData, UserData, cancelSpot, getQuantitySpots} from '../../global/scripts/apis';
 
 import {
   StyleSheet,
@@ -30,31 +32,25 @@ import {
 
 import { Header } from '../../components/Header';
 
+    
 export function WaitingSpot({ route, navigation }){
   
-  const [
-    currentLongitude,
-    setCurrentLongitude
-  ] = useState('...');
-  const [
-    currentLatitude,
-    setCurrentLatitude
-  ] = useState('...');
-
+  var intervalIdData = 0 as number;
   function handleBack(){
-    checkUserData().then(function(us){
-      cancelSpot(pkData.id, us != null ? us.id : '').then(function(result){
-        navigation.goBack();
-      });
-    });
+    removeReserveSpot();
+    window.clearInterval(intervalIdData);
+    intervalIdData = 0;
+    navigation.navigate("Home");
   }
-  const pkData = route.params.pkData;
+  // const pkData = route.params.pkData;
+  const [pkData, setPkData] = useState<ParkData>(route.params.pkData);
 
   function handleNavigation(val : ParkData){
      Alert.alert(
       "Deseja realmente Cancelar a vaga?",
       "Não iremos mais reservar uma vaga para este Estabelecimento!!",
-      [
+      [ 
+        { text: "Continuar com a Vaga", onPress: () => redirectPage() },
         { text: "OK", onPress: () => handleBack() }
       ]
     );
@@ -67,51 +63,89 @@ export function WaitingSpot({ route, navigation }){
     latitudeDelta: 0.0222,
     longitudeDelta: 0.0421,
   };
-    
-    const requestLocationPermission = async () => {
-      if (Platform.OS === 'ios') {
-        getOneTimeLocation();
-      } else {
-        try {
-          const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,{ title: 'Necessário acesso a localização', message: 'Gostariamos de ter acesso a sua localização!!', buttonPositive: 'Ok'});
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            getOneTimeLocation();
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      }
-    };
 
-  const getOneTimeLocation = () => {
-    /*Geolocation.getCurrentPosition(
-      (position) => {
-        setCurrentLongitude(JSON.stringify(position.coords.longitude));
-        setCurrentLatitude(JSON.stringify(position.coords.latitude));
+  const getLocation = async (result : ParkData) => {
+    var dist = await getDistParkData(result);
+    pkData.title = await getDistanceParkData(result);
+    pkData.quantitySpots = await getQuantitySpots(result);
+    setPkData(pkData);
+    debugger;
+    if(dist <= 1){
+      redirectPage();
+    }
+  }
+  const redirectPage = async () => {
+    window.clearInterval(intervalIdData);
+    intervalIdData = 0;
+    /*
+    PushNotification.configure({
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
       },
-      (error) => {},
-      { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000},
-    );*/
-  };
+      popInitialNotification: true,
+    });
+    
+    // 4. Send a push notification
+    PushNotification.localNotification({
+      title: 'Encontramos sua vaga!!',
+      message: `Agora você já pode se direcionar para a vaga que encontramos.`,
+      playSound: true,
+      soundName: 'default',
+    });
+    */
+
+    checkUserData().then(function(us){
+      reserveSpot(pkData.id).then(function(result){
+        if(result.spotId != null){
+          navigation.navigate("CurrentSpot", {trlData: result, pkData: pkData});
+        }else{
+          Alert.alert(
+            "Estacionamento Lotado!!",
+            "Temos muitas pessoas utilizando o aplicativo ao mesmo tempo.... e todas as vagas acabaram, entre em contato com um agente local!",
+            [ 
+              { text: "OK", onPress: () => navigation.navigate("Home") }
+            ]
+          );
+        }
+      });
+    });
+  }
+
+  function setIntervalLocation(){
+    return window.setInterval(function(){
+      getLocation(pkData);
+    }, 10000)
+  }
+  useFocusEffect(useCallback(() => {
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+  },[]));
 
   useEffect(() => {
-    //requestLocationPermission().then(function(item){
-        setTimeout(() => {
-          
-        checkUserData().then(function(us){
-          reserveSpot(pkData.id, us != null ? us.id : '').then(function(result){
-            navigation.navigate("CurrentSpot", {trlData: result, pkData: pkData});
-          });
-        });
-        /*var dis = getDistance(
-          {latitude: pkData.latitude, longitude: pkData.longitude},
-          {latitude: currentLatitude, longitude: currentLongitude},
-        );
-        alert(
-          `Distance\n\n${dis} Meter\nOR\n${dis / 1000} KM`
-        );*/
-      }, 5000);
-   // });
+    if(intervalIdData == 0)
+      intervalIdData = setIntervalLocation();
+    
+    BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 0.5, // fetch interval in minutes
+      },
+      async (taskId: any) => {
+        console.log('Received background-fetch event: ', taskId);
+
+        var dist = await getDistParkData(pkData);
+        if (dist <= 1) {
+          redirectPage();
+        }
+        
+        // Call finish upon completion of the background task
+        BackgroundFetch.finish(taskId);
+      },
+      error => {
+        console.error('RNBackgroundFetch failed to start.');
+      },
+    );
   }, []);
 
   return (
@@ -122,7 +156,7 @@ export function WaitingSpot({ route, navigation }){
                   id={pkData.id}
                   type={pkData.type}
                   title={pkData.title}
-                  amount={pkData.amount}
+                  distance={pkData.distance}
                   quantitySpots={pkData.quantitySpots}
                   latitude={pkData.latitude}
                   longitude={pkData.longitude}/>
@@ -131,7 +165,7 @@ export function WaitingSpot({ route, navigation }){
           <Marker
             key={pkData.id}
             coordinate={{ latitude : pkData.latitude , longitude : pkData.longitude }}
-            title={pkData.amount}
+            title={pkData.title}
             description={pkData.quantitySpots}
           />
         </MapView>

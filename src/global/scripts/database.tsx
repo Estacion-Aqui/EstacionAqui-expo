@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
-import {useNetInfo} from "@react-native-community/netinfo";
+import { ActivityIndicator, Alert, PermissionsAndroid, Platform  } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
 
 import {getAPIAllPlaces, ParkData, lastTravels, TravelData, UserData, sendUserData, checkLogin, confirmSpot, cancelSpot, checkSpot} from '../scripts/apis';
 
@@ -9,11 +12,14 @@ const placesId = '@EstacionAqui:places';
 const historicId = '@EstacionAqui:historic';
 const currentSpot = '@EstacionAqui:currentSpot';
 const userId = '@EstacionAqui:user';
+const userTermId = '@EstacionAqui:userTerm';
 
 export async function getDBAllPlaces(){
-    // const netInfo = useNetInfo();
+    var isConnected = await NetInfo.fetch().then(state => {
+      return state.isConnected;
+    });
 
-    // await AsyncStorage.removeItem(placesId);
+    await AsyncStorage.removeItem(placesId);
     let response = await AsyncStorage.getItem(placesId);
 
     let getDt = response ? JSON.parse(response) : [];
@@ -21,14 +27,13 @@ export async function getDBAllPlaces(){
     const getDtFormatted: ParkData[] = getDt ? getDt.map((item: ParkData) => { return item }) : getDt;
 
     var respMap = new Map();
-      respMap = await getAPIAllPlaces(getDtFormatted);
-    /*if(netInfo.isConnected){
+    if(isConnected){
       respMap = await getAPIAllPlaces(getDtFormatted);
     }else{      
       getDtFormatted.forEach(function(item : ParkData){
           respMap.set(item.id, item);
       }, {respMap})
-    }*/
+    }
 
     var allParks : ParkData[];
     allParks = [];
@@ -60,6 +65,7 @@ export async function getDBLastTravelAllPlaces(){
         responseData = {
           id: '',
           name: '',
+          plate: '',
           email: '',
           password: '',
           car: ''
@@ -88,7 +94,7 @@ export async function getDBEstabData(estabId : string){
         id: '',
         type: 'open',
         title : '',
-        amount : '',
+        distance : '',
         quantitySpots : '',
         latitude : 0,
         longitude : 0
@@ -104,8 +110,8 @@ export async function getDBEstabData(estabId : string){
 
 }
 
-export async function setUserData(id : string,name : string, car : string, email : string, password : string){
-  var respData = await sendUserData({id: id, name: name, car: car, email: email, password: password});
+export async function setUserData(id : string,name : string, car : string, email : string, password : string, plate: string){
+  var respData = await sendUserData({id: id, name: name, car: car, email: email, password: password, plate: plate});
 
   await AsyncStorage.setItem(userId, JSON.stringify(respData));
   var returnData :  UserData;
@@ -129,15 +135,17 @@ export async function checkUserData(){
   var returnData :  UserData;
   returnData = {
     id : "",
+    plate : "",
     name : "",
     car : "",
     password : "",
     email : ""
   }
   var returnDataJSON = await AsyncStorage.getItem(userId);
-  if(returnDataJSON != null)
+  if(returnDataJSON != null){
     returnData = JSON.parse(returnDataJSON);
-  else
+    return returnData;
+  }else
     return null;
 }
 export async function logouts(){
@@ -145,7 +153,7 @@ export async function logouts(){
 }
 
 export async function confirmSpotDB(parkId : String, spotId : String, usId : String){
-  var respData = await confirmSpot(parkId, spotId, usId);
+  var respData = await confirmSpot(parkId);
   var returnData :  UserData;
   returnData = respData;
 
@@ -153,4 +161,34 @@ export async function confirmSpotDB(parkId : String, spotId : String, usId : Str
     await AsyncStorage.setItem(userId, JSON.stringify(respData));
 
   return returnData;
+}
+
+export async function setReserveSpot(dts : ParkData){
+  await AsyncStorage.setItem(currentSpot, JSON.stringify(dts));
+}
+
+export async function removeReserveSpot(){
+  await AsyncStorage.removeItem(currentSpot);
+}
+export async function getReserveSpot(){
+  var returnDataJSON = await AsyncStorage.getItem(currentSpot);
+  if(returnDataJSON == null){   
+    return returnDataJSON;   
+  }else{
+    return JSON.parse(returnDataJSON);
+  }
+}
+
+export async function checkTerm(){
+  var accepts = { accept : true};
+  var returnDataJSON = await AsyncStorage.getItem(userTermId);
+  await AsyncStorage.removeItem(userTermId);
+  if(returnDataJSON == null){      
+    if(Platform.OS !== 'ios') {
+      const granted = await Location.requestForegroundPermissionsAsync();
+      if (granted.granted) {
+        await AsyncStorage.setItem(userTermId, JSON.stringify(accepts))
+      }
+    }
+  }
 }

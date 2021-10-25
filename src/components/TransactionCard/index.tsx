@@ -17,11 +17,11 @@ export function TransactionCard(pkData : ParkData){
   return (
     <Container>
       <Title>
-        {pkData.title}
+        {pkData.distance}
       </Title>
 
       <Amount >
-        {pkData.amount}
+        {pkData.title}
       </Amount>
 
       <Footer>

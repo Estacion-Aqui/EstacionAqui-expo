@@ -22,13 +22,13 @@ export const Header = styled.View`
 
 export const Title = styled.Text<TypeProps>`
   font-family: ${({ theme }) => theme.fonts.regular};
-  font-size: ${RFValue(14)}px;
+  font-size: ${RFValue(15)}px;
   color: ${({ theme, type }) =>
   type === 'empty' ? theme.colors.shape :  theme.colors.text_dark};
 `;
 
 export const Icon = styled(FontAwesome5)<TypeProps>`
-  font-size: ${RFValue(35)}px;
+  font-size: ${RFValue(33)}px;
   ${({ type }) => type === 'open' && css`
     color: ${({ theme }) => theme.colors.success};
   `};
@@ -44,7 +44,7 @@ export const Footer = styled.View``;
 
 export const Amount = styled.Text<TypeProps>`
   font-family: ${({ theme }) => theme.fonts.medium};
-  font-size: ${RFValue(17)}px;
+  font-size: ${RFValue(19)}px;
   font-weight: bold;
   color: ${({ theme, type }) =>
   type === 'empty' ? theme.colors.shape :  theme.colors.text_dark};

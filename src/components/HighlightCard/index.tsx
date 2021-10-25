@@ -25,11 +25,11 @@ export function HighlightCard(pkData : ParkData){
   const [title, settitle] = useState<string>('');
   
   function getData(){
-    if(pkData.amount != ''){
-      settitle(pkData.amount);
+    if(pkData.title != ''){
+      settitle(pkData.title);
     }else{
       getDBEstabData(pkData.id).then(function(result){
-        settitle(result.amount);
+        settitle(result.title);
       });
     }
   }
@@ -45,7 +45,7 @@ export function HighlightCard(pkData : ParkData){
     <Container type={pkData.type}>
       <Header>
         <Title type={pkData.type}>
-          {pkData.title}
+          {pkData.distance}
         </Title>
         <Icon
           name={icon[pkData.type]}
