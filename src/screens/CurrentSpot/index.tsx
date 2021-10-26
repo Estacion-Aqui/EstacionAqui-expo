@@ -5,7 +5,7 @@ import { Modular } from '../../components/Modular';
 import { ActivityIndicator, Alert  } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {ParkData, TravelData, reserveSpot, getQuantitySpots, checkSpot, UserData} from '../../global/scripts/apis';
-import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin} from '../../global/scripts/database';
+import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin, saveHistory} from '../../global/scripts/database';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
@@ -44,7 +44,7 @@ export function CurrentSpot({ route, navigation }){
   }
   function handleBack(){
       reserveSpot(pkData.id).then(function(result){
-        if(result.spotId != null){
+        if(result.spotId != null && result.spotId != ''){
           Alert.alert(
             "Nova vaga encontrada!!",
             "Encontramos uma nova vaga para voce",
@@ -69,6 +69,7 @@ export function CurrentSpot({ route, navigation }){
     window.clearInterval(intervalIdData);
     intervalIdData = 0;
     navigation.navigate("EndFlow", {pkData: pkData});
+    saveHistory(trlData);
   }
   const getLocation = async (result : ParkData) => {
     pkData.quantitySpots = await getQuantitySpots(result);

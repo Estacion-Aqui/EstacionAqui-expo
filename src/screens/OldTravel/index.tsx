@@ -74,7 +74,7 @@ export function OldTravel({ navigation }){
                     id={val.estabId}
                     type={'closed'}
                     title={val.day}
-                    distance={''}
+                    distance={val.title}
                     quantitySpots={'Vaga Estacionada: ' +val.spotId}
                     latitude={0}
                     longitude={0}

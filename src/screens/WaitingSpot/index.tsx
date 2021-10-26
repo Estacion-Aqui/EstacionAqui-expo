@@ -8,7 +8,7 @@ import { Modular } from '../../components/Modular';
 
 
 import BackgroundFetch from 'react-native-background-fetch';
-import PushNotification from 'react-native-push-notification';
+// import PushNotification from 'react-native-push-notification';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
@@ -50,7 +50,7 @@ export function WaitingSpot({ route, navigation }){
       "Deseja realmente Cancelar a vaga?",
       "Não iremos mais reservar uma vaga para este Estabelecimento!!",
       [ 
-        { text: "Continuar com a Vaga", onPress: () => redirectPage() },
+        { text: "Continuar com a Vaga", onPress: () => console.log("Keep Page") },
         { text: "OK", onPress: () => handleBack() }
       ]
     );
@@ -66,17 +66,16 @@ export function WaitingSpot({ route, navigation }){
 
   const getLocation = async (result : ParkData) => {
     var dist = await getDistParkData(result);
-    pkData.title = await getDistanceParkData(result);
+    pkData.distance = await getDistanceParkData(result);
     pkData.quantitySpots = await getQuantitySpots(result);
     setPkData(pkData);
     debugger;
     if(dist <= 1){
+      window.clearInterval(intervalIdData);
       redirectPage();
     }
   }
   const redirectPage = async () => {
-    window.clearInterval(intervalIdData);
-    intervalIdData = 0;
     /*
     PushNotification.configure({
       permissions: {
@@ -99,6 +98,7 @@ export function WaitingSpot({ route, navigation }){
     checkUserData().then(function(us){
       reserveSpot(pkData.id).then(function(result){
         if(result.spotId != null){
+          window.clearInterval(intervalIdData);
           navigation.navigate("CurrentSpot", {trlData: result, pkData: pkData});
         }else{
           Alert.alert(

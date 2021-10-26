@@ -19,6 +19,7 @@ export interface TravelData {
   spotSector : string;
   spotId : string;
   estabId : string;
+  title : string;
   day : string;
   confirmed: Boolean;
   cancelled: Boolean;
@@ -35,11 +36,11 @@ export interface ParkData {
 }
 export interface UserData {
   id: string;
-  name : string;
+  email : string;
+  user : string;
   car : string;
   plate : string;
   password : string;
-  email : string;
 }
 
 export function oauth(){
@@ -96,8 +97,40 @@ export async function lastTravels(usId : String){
     var respData : TravelData[];
     respData = [];
     try {
-        var resp  = await api.get(`/travelData?usId=${usId}`);
-        respData = (resp.data);
+        var resp  = await api.get(`/spots/history/${usId}`);
+
+        var respPlaces  = await api.get('/places');
+        
+        var respPlacesmap = {};
+        respPlaces.data.forEach(function(item){
+            respPlacesmap[item?.id] = item;
+        });
+        
+        var respSectors  = await api.get('/sectors');
+        var respSectorsmap = {};
+        respSectors.data.forEach(function(item){
+            respSectorsmap[item?.id] = item;
+        });
+
+        var respSpots  = await api.get('/spots');
+        var respSpotsmap = {};
+        respSpots.data.forEach(function(item){
+            respSpotsmap[item?.id] = item;
+        });
+
+        resp.data.forEach(function(item){
+            respData.push({
+                id : item.id,
+                day : item.createdAt,
+                cancelled: false,
+                confirmed: false,
+                
+                spotSector : respSectorsmap[item.spotSector].code,
+                spotId : respSpotsmap[item.spotId].title, 
+                estabId : respPlacesmap[item.estabId].title,
+                title : item.title
+            });
+        });
     } catch (error) {
         console.log(error);
     }   
@@ -106,7 +139,7 @@ export async function lastTravels(usId : String){
 export async function checkLogin(emails : string, password: string){
     try {
         // var resp = await api.post('/checkLogin', ({email: emails, password: password}));
-        var resp = await api.get('/checkLogin');
+        var resp = await api.post('/users/checkLogin', {email: emails, password : password});
         console.log('resp'+resp.data);
         return resp.data;
     } catch (error) {
@@ -117,7 +150,18 @@ export async function checkLogin(emails : string, password: string){
 export async function sendUserData(us : UserData){
     try {
         // var resp = await api.post((us.id ? '/updateData' : '/insertData'), JSON.stringify(us));
-        var resp = await api.get((us.id ? '/updateData' : '/insertData'));
+        var resp = await api.post((us.id ? `/users/${us.id}` : '/users'), JSON.stringify(us));
+        console.log('resp'+resp.data);
+        return resp.data;
+    } catch (error) {
+        console.log(error);
+    }   
+    return null;
+}
+export async function changePasswordData(usId : String, lastPassword: String, newPassword: String, confirmationPassword: String){
+    try {
+        // var resp = await api.post((us.id ? '/updateData' : '/insertData'), JSON.stringify(us));
+        var resp = await api.post((`/users/${usId}/changePassword`), {lastPassword:lastPassword, newPassword:newPassword, confirmationPassword:confirmationPassword});
         console.log('resp'+resp.data);
         return resp.data;
     } catch (error) {
@@ -137,6 +181,7 @@ export async function reserveSpot(parkId : string){
         id : '',
         spotId : '',
         spotSector : '',
+        title : '',
         estabId: parkId,
         day : ( date + '/' + month + '/' + year),
         cancelled: false,
@@ -146,11 +191,15 @@ export async function reserveSpot(parkId : string){
         // var resp = await api.get(`/reserveSpot?user=${usId}&parkId=${parkId}`);
         var resp = await api.get(`/spots/free/${parkId}`);
 
-        // var respSector = await api.get(`/sectors/${resp.data.sector}`);
+        console.log(resp.data?.sector);
+        
+        let sectorID = resp.data?.sector ? resp.data?.sector : '';
+
+        var respSector = await api.get(`/sectors/${sectorID}`);
 
         respData.id = resp.data?.id;
         respData.spotId = resp.data.message ? null : resp.data?.title;
-        respData.spotSector = '23';//respSector.data?.code;
+        respData.spotSector = respSector.data?.code;
         return respData;
     } catch (error) {
         console.log(error);
@@ -201,4 +250,16 @@ export async function getQuantitySpots(pks : ParkData){
         console.log(error);
     }  
     return resultData;
+}
+
+export async function saveHistoryAPI(usId : String, trl : TravelData){
+    try {
+        // var resp = await api.post((us.id ? '/updateData' : '/insertData'), JSON.stringify(us));
+        var resp = await api.post(`/spots/history`, {usId:usId, spotId:trl.spotId});
+        console.log('resp'+resp.data);
+        return resp.data;
+    } catch (error) {
+        console.log(error);
+    }   
+    return null;
 }

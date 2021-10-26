@@ -56,6 +56,11 @@ export function Setup({ navigation }){
  function logout(){
     logouts();
     setData(undefined);
+    setName('');
+    setCar('');
+    setEmail('');
+    setPassword('');
+    setPlate('');
  }
  function loginSucess(item : UserData){
   Alert.alert(
@@ -65,7 +70,7 @@ export function Setup({ navigation }){
       { text: "OK", onPress: () => console.log("OK Pressed") }
     ]
   );
-  setData({id : item.id, name : item.name,email : item.email,car : item.car,password : item.password, plate : item.plate});
+  setData({id : item.id, user : item.user,email : item.email,car : item.car,password : item.password, plate : item.plate});
 
  }
  function checkData(){
@@ -87,7 +92,7 @@ export function Setup({ navigation }){
    }else{
       Alert.alert(
       "Preencha todos os dados",
-      "Favor preencher os dados de Nome, Email, Carro e Senha!!",
+      "Favor preencher os dados de Nome, Email, Placa do Carro, Carro e Senha!!",
       [
         { text: "OK", onPress: () => console.log("OK Pressed") }
       ]
@@ -107,15 +112,16 @@ export function Setup({ navigation }){
           ]
         );
       }else{
-        setName(item.name);
+        setName(item.user);
         setCar(item.car);
+        setPlate(item.plate);
         loginSucess(item);
       }
     })
    }else{
       Alert.alert(
       "Preencha todos os dados",
-      "Favor preencher os dados de Nome, Email, Carro e Senha!!",
+      "Favor preencher os dados de Email e Senha!!",
       [
         { text: "OK", onPress: () => console.log("OK Pressed") }
       ]
@@ -140,7 +146,7 @@ export function Setup({ navigation }){
                 <Icon name="edit"/>
               </LogoutButton>
               {/* https://avatars.githubusercontent.com/GTeixeirinha7?v=4 */}
-              <Photo source={{ uri: 'https://www.pinpng.com/pngs/m/341-3415688_no-avatar-png-transparent-png.png'}}/>
+              {/* <Photo source={{ uri: 'https://www.pinpng.com/pngs/m/341-3415688_no-avatar-png-transparent-png.png'}}/> */}
             </ContainerPhoto>
           </UserInfo>
         </UserWrapper>
@@ -150,7 +156,7 @@ export function Setup({ navigation }){
           <TextInput
             placeholder="Nome Completo"
             onChangeText={text => setName(text)}
-            defaultValue={usData == null ? "" : usData.name}
+            defaultValue={usData == null ? "" : usData.user}
             style={styles.inputs}
             keyboardType="default"
           />
@@ -204,6 +210,12 @@ export function Setup({ navigation }){
         </>
           :
         <>
+          <Button
+            buttonStyle={styles.buttonStyle}
+            titleStyle={styles.buttonText}
+            onPress = {() => navigation.navigate('ChangePassword', {usId: usData.id})}
+            title="Mudar Senha"
+          />
           <Button
             buttonStyle={styles.buttonAttentionStyle}
             titleStyle={styles.buttonText}

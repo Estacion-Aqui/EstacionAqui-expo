@@ -14,6 +14,7 @@ import { CurrentSpot } from '../screens/CurrentSpot';
 import { EndFlow } from '../screens/EndFlow';
 import { OldTravel } from '../screens/OldTravel';
 import { Setup } from '../screens/Setup';
+import { ChangePassword } from '../screens/ChangePassword';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -110,6 +111,7 @@ const ConfigNavigator = () => {
   return (
     <Stack.Navigator screenOptions={screenOptionStyle}>
       <Stack.Screen name="Setup" component={Setup} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
     </Stack.Navigator>
   );
 }

@@ -6,7 +6,7 @@ import NetInfo from "@react-native-community/netinfo";
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 
-import {getAPIAllPlaces, ParkData, lastTravels, TravelData, UserData, sendUserData, checkLogin, confirmSpot, cancelSpot, checkSpot} from '../scripts/apis';
+import {getAPIAllPlaces, ParkData, lastTravels, TravelData, UserData, sendUserData, checkLogin, confirmSpot, cancelSpot, checkSpot, saveHistoryAPI} from '../scripts/apis';
 
 const placesId = '@EstacionAqui:places';
 const historicId = '@EstacionAqui:historic';
@@ -19,7 +19,7 @@ export async function getDBAllPlaces(){
       return state.isConnected;
     });
 
-    await AsyncStorage.removeItem(placesId);
+    // await AsyncStorage.removeItem(placesId);
     let response = await AsyncStorage.getItem(placesId);
 
     let getDt = response ? JSON.parse(response) : [];
@@ -64,7 +64,7 @@ export async function getDBLastTravelAllPlaces(){
       }else{
         responseData = {
           id: '',
-          name: '',
+          user: '',
           plate: '',
           email: '',
           password: '',
@@ -111,7 +111,7 @@ export async function getDBEstabData(estabId : string){
 }
 
 export async function setUserData(id : string,name : string, car : string, email : string, password : string, plate: string){
-  var respData = await sendUserData({id: id, name: name, car: car, email: email, password: password, plate: plate});
+  var respData = await sendUserData({id: id, user: name, car: car, email: email, password: password, plate: plate});
 
   await AsyncStorage.setItem(userId, JSON.stringify(respData));
   var returnData :  UserData;
@@ -136,7 +136,7 @@ export async function checkUserData(){
   returnData = {
     id : "",
     plate : "",
-    name : "",
+    user : "",
     car : "",
     password : "",
     email : ""
@@ -182,7 +182,6 @@ export async function getReserveSpot(){
 export async function checkTerm(){
   var accepts = { accept : true};
   var returnDataJSON = await AsyncStorage.getItem(userTermId);
-  await AsyncStorage.removeItem(userTermId);
   if(returnDataJSON == null){      
     if(Platform.OS !== 'ios') {
       const granted = await Location.requestForegroundPermissionsAsync();
@@ -190,5 +189,13 @@ export async function checkTerm(){
         await AsyncStorage.setItem(userTermId, JSON.stringify(accepts))
       }
     }
+  }
+}
+export async function saveHistory(places : TravelData){
+  var returnDataJSON = await AsyncStorage.getItem(userId);
+  if(returnDataJSON != null){  
+    const getDtFormatted: UserData = JSON.parse(returnDataJSON) ;
+    await saveHistoryAPI(getDtFormatted.id, places);
+    await getDBLastTravelAllPlaces();
   }
 }

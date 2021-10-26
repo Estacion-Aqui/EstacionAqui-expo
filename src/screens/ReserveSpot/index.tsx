@@ -42,7 +42,7 @@ export function ReserveSpot({ route, navigation }){
   }
 
   const getLocation = async (result : ParkData) => {
-    pkData.title = await getDistanceParkData(result);
+    pkData.distance = await getDistanceParkData(result);
     pkData.quantitySpots = await getQuantitySpots(result);
   }
 

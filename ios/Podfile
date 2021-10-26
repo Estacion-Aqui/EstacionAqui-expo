@@ -18,4 +18,6 @@ target 'EstacionAqui' do
   #     flipper_post_install(installer)
   #   end
   # end
+  pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
+
 end
