@@ -97,10 +97,12 @@ export function WaitingSpot({ route, navigation }){
 
     checkUserData().then(function(us){
       reserveSpot(pkData.id).then(function(result){
-        if(result.spotId != null){
+        if(result.spotId != null && result.spotId != ''){
           window.clearInterval(intervalIdData);
           navigation.navigate("CurrentSpot", {trlData: result, pkData: pkData});
         }else{
+          window.clearInterval(intervalIdData);
+          removeReserveSpot();
           Alert.alert(
             "Estacionamento Lotado!!",
             "Temos muitas pessoas utilizando o aplicativo ao mesmo tempo.... e todas as vagas acabaram, entre em contato com um agente local!",
@@ -127,7 +129,7 @@ export function WaitingSpot({ route, navigation }){
     if(intervalIdData == 0)
       intervalIdData = setIntervalLocation();
     
-    BackgroundFetch.configure(
+    /*BackgroundFetch.configure(
       {
         minimumFetchInterval: 0.5, // fetch interval in minutes
       },
@@ -145,7 +147,7 @@ export function WaitingSpot({ route, navigation }){
       error => {
         console.error('RNBackgroundFetch failed to start.');
       },
-    );
+    );*/
   }, []);
 
   return (
