@@ -5,7 +5,7 @@ import { Modular } from '../../components/Modular';
 import { ActivityIndicator, Alert  } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {ParkData, TravelData, reserveSpot, getQuantitySpots, checkSpot, UserData} from '../../global/scripts/apis';
-import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin, saveHistory} from '../../global/scripts/database';
+import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin, saveHistory, removeReserveSpot, setCurrentSpot} from '../../global/scripts/database';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
@@ -82,7 +82,8 @@ export function CurrentSpot({ route, navigation }){
     }, 10000)
   }
   useFocusEffect(useCallback(() => {
-    
+    removeReserveSpot();
+    setCurrentSpot({trlData: trlData, pkData : pkData});
     checkUserData().then(function(us){
       if(us != null)
         setUsData(us);
@@ -92,6 +93,8 @@ export function CurrentSpot({ route, navigation }){
   },[]));
 
   useEffect(() => {
+    removeReserveSpot();
+    setCurrentSpot({trlData: trlData, pkData : pkData});
     checkUserData().then(function(us){
       if(us != null)
         setUsData(us);
@@ -126,7 +129,7 @@ export function CurrentSpot({ route, navigation }){
             activeOpacity={0.7}
             >
               <Text style={styles.spotTextInside}>
-                  {trlData.spotSector ?  trlData.spotSector : ' - '}
+                  {trlData.spotSector ?  trlData.spotSector : 'A'}
               </Text>
             </TouchableOpacity>
           </View>
