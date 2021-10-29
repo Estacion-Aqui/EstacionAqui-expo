@@ -6,11 +6,12 @@ import NetInfo from "@react-native-community/netinfo";
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 
-import {getAPIAllPlaces, ParkData, lastTravels, TravelData, UserData, sendUserData, checkLogin, confirmSpot, cancelSpot, checkSpot, saveHistoryAPI} from '../scripts/apis';
+import {getAPIAllPlaces, ParkData, lastTravels, TravelData, UserData, sendUserData, checkLogin, confirmSpot, cancelSpot, checkSpot, SpotData, saveHistoryAPI} from '../scripts/apis';
 
 const placesId = '@EstacionAqui:places';
 const historicId = '@EstacionAqui:historic';
 const currentSpot = '@EstacionAqui:currentSpot';
+const currentSpotData = '@EstacionAqui:currentSpotData';
 const userId = '@EstacionAqui:user';
 const userTermId = '@EstacionAqui:userTerm';
 
@@ -72,7 +73,7 @@ export async function getDBLastTravelAllPlaces(){
         };
       }
         
-      getDtFormatted = await lastTravels(responseData.id);
+      getDtFormatted = await lastTravels(responseData?.id);
     // }
 
     await AsyncStorage.setItem(historicId, JSON.stringify(getDtFormatted));
@@ -125,7 +126,7 @@ export async function checkDataLogin(email : string, password : string){
   var returnData :  UserData;
   returnData = respData;
 
-  if(returnData.id)
+  if(returnData?.id)
     await AsyncStorage.setItem(userId, JSON.stringify(respData));
 
   return returnData;
@@ -157,7 +158,7 @@ export async function confirmSpotDB(parkId : String, spotId : String, usId : Str
   var returnData :  UserData;
   returnData = respData;
 
-  if(returnData.id)
+  if(returnData?.id)
     await AsyncStorage.setItem(userId, JSON.stringify(respData));
 
   return returnData;
@@ -179,10 +180,25 @@ export async function getReserveSpot(){
   }
 }
 
+export async function setCurrentSpot(dts : SpotData){
+  await AsyncStorage.setItem(currentSpotData, JSON.stringify(dts));
+}
+export async function removeCurrentSpot(){
+  await AsyncStorage.removeItem(currentSpotData);
+}
+export async function getCurrentSpot(){
+  var returnDataJSON = await AsyncStorage.getItem(currentSpotData);
+  if(returnDataJSON == null){   
+    return null;   
+  }else{
+    return JSON.parse(returnDataJSON);
+  }
+}
+
 export async function checkTerm(){
   var accepts = { accept : true};
   var returnDataJSON = await AsyncStorage.getItem(userTermId);
-  if(returnDataJSON == null){      
+  if(!returnDataJSON){      
     if(Platform.OS !== 'ios') {
       const granted = await Location.requestForegroundPermissionsAsync();
       if (granted.granted) {
@@ -195,7 +211,8 @@ export async function saveHistory(places : TravelData){
   var returnDataJSON = await AsyncStorage.getItem(userId);
   if(returnDataJSON != null){  
     const getDtFormatted: UserData = JSON.parse(returnDataJSON) ;
-    await saveHistoryAPI(getDtFormatted.id, places);
+    if(getDtFormatted && getDtFormatted.id)
+      await saveHistoryAPI(getDtFormatted.id, places);
     await getDBLastTravelAllPlaces();
   }
 }

@@ -6,8 +6,8 @@ import {  TouchableHighlight } from 'react-native-gesture-handler';
 import { Header } from '../../components/Header';
 import { HighlightCard } from '../../components/HighlightCard';
 import { Modular } from '../../components/Modular';
-import {ParkData, getQuantitySpots} from '../../global/scripts/apis';
-import {getDBAllPlaces, getReserveSpot} from '../../global/scripts/database';
+import {ParkData, getQuantitySpots, SpotData} from '../../global/scripts/apis';
+import {getDBAllPlaces, getReserveSpot, getCurrentSpot} from '../../global/scripts/database';
 import {checkTerm} from '../../global/scripts/database';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
@@ -60,23 +60,29 @@ export function Dashboard({ navigation }){
     console.log(latitude);
     console.log(longitude);
     
-    updateDistance(result, latitude, longitude);
+    await updateDistance(result, latitude, longitude);
   }
 
   const theme = useTheme();
 
   var allParksData = [] as ParkData[];
   const [allParks, setAllParks] = useState<ParkData[]>([]);
-  var intervalIdData = 0 as number;
+  var intervalIdData;
 
   function getData(){
     getDBAllPlaces().then(function(result){
-      checkTerm();
       getLocation(result);
-      setIsLoading(false);
-      /*if(intervalIdData == 0)
-        intervalIdData = setIntervalLocation();*/
+      if(intervalIdData == 0)
+        intervalIdData = setIntervalLocation();
       checkExistReservation();
+      setIsLoading(false);
+    });
+  }
+  function getDataInterval(){
+    getDBAllPlaces().then(function(result){
+      getLocation(result);
+      checkExistReservation();
+      setIsLoading(false);
     });
   }
   function checkExistReservation(){
@@ -84,38 +90,48 @@ export function Dashboard({ navigation }){
       if(result != null){
         navigation.navigate("WaitingSpot", {pkData: result});
       }
+      getCurrentSpot().then(function(result : SpotData){
+        if(result != null){
+          navigation.navigate("CurrentSpot", {trlData: result.trlData, pkData: result.pkData});
+        }
+      });
     });
   }
 
   function setIntervalLocation(){
     return window.setInterval(function(){
-      getLocation(allParksData);
+      getDataInterval();
     }, 10000)
   }
 
-  function updateDistance( result : ParkData[], latitude : number, longitude : number){
-    result.forEach(function(item){
+  async function updateDistance( result : ParkData[], latitude : number, longitude : number){
+    let resultNew : ParkData[] = [];
+    for(var i=0; i<result.length;i++){
+      var item = result[i];
       var inData = {lat: item.latitude, long : item.longitude};
       var outData = {lat: latitude, long : longitude};
       item.distance = getDistanceStringData(inData, outData);
-      if(item.type == 'open')
-        getSpots(item);
-    });
-    setAllParks(result);
+      console.log('item'+item.type);
+      if(item.type == 'open'){
+        let qtds = await getQuantitySpots(item);
+        item.quantitySpots = qtds ; 
+      }
+      resultNew.push(item);
+    }
+    console.log(resultNew);
+    setAllParks(resultNew);
     allParksData = [];
-    allParksData.push(...result);
+    allParksData.push(...resultNew);
   }
-  const getSpots = async (result : ParkData) => {
-    result.quantitySpots = await getQuantitySpots(result);
-  }
-
 
 
   useEffect(() => {
+    checkTerm();
     getData();
   }, []);
 
   useFocusEffect(useCallback(() => {
+    checkTerm();
     getData()
   },[]));
 

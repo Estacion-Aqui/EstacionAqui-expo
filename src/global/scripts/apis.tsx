@@ -25,6 +25,11 @@ export interface TravelData {
   cancelled: Boolean;
 }
 
+export interface SpotData{
+  trlData: TravelData;
+  pkData: ParkData;
+}
+
 export interface ParkData {
   id: string;
   type: 'open' | 'closed' | 'empty';
