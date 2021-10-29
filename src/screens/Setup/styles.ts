@@ -13,7 +13,7 @@ export const ContentView = styled.View.attrs({
   align-items: center;
   padding: 0;
   flex: 1;
-  margin-top: ${RFPercentage(12)}px;
+  margin-top: ${RFPercentage(2)}px;
 `;
 
 export const ContentViewInput = styled.View.attrs({
@@ -115,9 +115,9 @@ export const Transactions = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: ${RFValue(18)}px;
+  font-size: ${RFValue(39)}px;
   font-family: ${({ theme }) => theme.fonts.regular};
-
+  color: white;
   margin-bottom: 16px;
 `;
 

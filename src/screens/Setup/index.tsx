@@ -15,6 +15,7 @@ import {
     ActivityIndicator, 
     Alert,
     TextInput,
+    Text,
     StyleSheet
 } from 'react-native';
 
@@ -25,6 +26,7 @@ import {
   HeaderStyle,
   UserWrapper,
   UserInfo,
+  Title,
   Photo,
   User,
   UserGreeting,
@@ -52,7 +54,11 @@ export function Setup({ navigation }){
         setData(undefined);
     });
   }
-
+  function setPlateData(text){
+    debugger;
+    text = text?.replace(/[^a-zA-Z0-9]/g, '').substring(0,7);
+    setPlate(text);
+  }
  function logout(){
     logouts();
     setData(undefined);
@@ -76,7 +82,7 @@ export function Setup({ navigation }){
  function checkData(){
    if(usDataName && usDataCar && usDataEmail && usDataPassword && usDataPlate){
     setUserData('', usDataName, usDataCar, usDataEmail, usDataPassword, usDataPlate).then(function(item){
-      if(!item.id){
+      if(!item || !item.id){
         Alert.alert(
           "Usuario Invalido",
           "Usuario invalido favor realizar novamente a solicitação",
@@ -103,7 +109,7 @@ export function Setup({ navigation }){
  function checkDataLogins(){
    if(usDataEmail && usDataPassword){
     checkDataLogin(usDataEmail, usDataPassword).then(function(item){
-      if(!item.id){
+      if(!item || !item.id){
         Alert.alert(
           "Usuario Invalido",
           "Usuario invalido favor realizar novamente a solicitação",
@@ -142,11 +148,7 @@ export function Setup({ navigation }){
         <UserWrapper>
            <UserInfo>
             <ContainerPhoto> 
-              <LogoutButton onPress={() => {}}>
-                <Icon name="edit"/>
-              </LogoutButton>
-              {/* https://avatars.githubusercontent.com/GTeixeirinha7?v=4 */}
-              {/* <Photo source={{ uri: 'https://www.pinpng.com/pngs/m/341-3415688_no-avatar-png-transparent-png.png'}}/> */}
+              <Title>EstacionAqui!!</Title>
             </ContainerPhoto>
           </UserInfo>
         </UserWrapper>
@@ -169,8 +171,9 @@ export function Setup({ navigation }){
           />
           <TextInput
             placeholder="Placa do Carro"
-            onChangeText={text => setPlate(text)}
+            onChangeText={text => setPlateData(text)}
             defaultValue={usData == null ? "" : usData.plate}
+            value={usDataPlate}
             style={styles.inputs}
             keyboardType="default"
           />
