@@ -3,6 +3,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 import { useTheme } from 'styled-components';
+import { TransactionCard } from '../../components/TransactionCard';
 import { Modular } from '../../components/Modular';
 import {  TouchableHighlight } from 'react-native-gesture-handler';
 import {TravelData} from '../../global/scripts/apis';
@@ -67,6 +68,20 @@ export function OldTravel({ navigation }){
         <>
         <Header></Header>
         <HighlightCards>
+          
+      {
+        allParks.length == 0 ?
+            <TransactionCard 
+                      id={'123'}
+                      type={'open'}
+                      title={'Você ainda não possui historico de vagas...\n\nRealize login ou reserve uma vaga!!'}
+                      distance={''}
+                      quantitySpots={''}
+                      latitude={0}
+                      longitude={0}/> :
+        <>
+        </>
+      }
           {
             allParks.map(val => (
                 <TouchableHighlight key={val.id}>
