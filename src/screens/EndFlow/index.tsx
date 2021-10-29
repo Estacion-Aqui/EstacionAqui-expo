@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Linking } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { TransactionCard } from '../../components/TransactionCard';
 import { Modular } from '../../components/Modular';
 import {ParkData} from '../../global/scripts/apis';
+import {removeCurrentSpot} from '../../global/scripts/database';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
     StyleSheet,
@@ -34,6 +36,13 @@ export function EndFlow({ route, navigation }){
   function getSearchName(){
     return pkData.title.split(' ').join('+');
   }
+  useFocusEffect(useCallback(() => {
+    removeCurrentSpot();
+  },[]));
+
+  useEffect(() => {
+    removeCurrentSpot();
+  }, []);
   
   return (
     <Container>
