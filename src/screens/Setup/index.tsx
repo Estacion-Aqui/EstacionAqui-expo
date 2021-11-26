@@ -55,7 +55,6 @@ export function Setup({ navigation }){
     });
   }
   function setPlateData(text){
-    debugger;
     text = text?.replace(/[^a-zA-Z0-9]/g, '').substring(0,7);
     setPlate(text);
   }

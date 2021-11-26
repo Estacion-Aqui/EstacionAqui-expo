@@ -5,7 +5,7 @@ import { Modular } from '../../components/Modular';
 import { ActivityIndicator, Alert  } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {ParkData, TravelData, reserveSpot, getQuantitySpots, checkSpot, UserData} from '../../global/scripts/apis';
-import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin, saveHistory, removeReserveSpot, setCurrentSpot} from '../../global/scripts/database';
+import {getDBEstabData, checkUserData, logouts, setUserData, checkDataLogin, removeCurrentSpot, saveHistory, removeReserveSpot, setCurrentSpot} from '../../global/scripts/database';
 
 import { Button } from 'react-native-elements';
 import theme from '../../global/styles/theme';
@@ -32,15 +32,23 @@ export function CurrentSpot({ route, navigation }){
 
   var intervalIdData = 0 as number;
   const checkStatusSpot = async (result : TravelData) => {
+    
+    checkUserData().then(function(us){
       checkSpot(result.id).then(function(item){
         if(item.status) return;
 
-        if(usData != null && item.plate == usData?.plate){
+        if(us != null && item.plate == us?.plate){
           handleNavigation();
         }else{
           handleBack();
         }
       });
+    });
+  }
+  function handleHome(){
+    navigation.navigate("Home");
+    removeReserveSpot();
+    removeCurrentSpot();
   }
   function handleBack(){
       reserveSpot(pkData.id).then(function(result){
@@ -59,7 +67,7 @@ export function CurrentSpot({ route, navigation }){
             "Estacionamento Lotado!!",
             "Temos muitas pessoas utilizando o aplicativo ao mesmo tempo.... e todas as vagas acabaram, entre em contato com um agente local!",
             [ 
-              { text: "OK", onPress: () => navigation.navigate("Home") }
+              { text: "OK", onPress: () => handleHome() }
             ]
           );
         }
@@ -145,22 +153,12 @@ export function CurrentSpot({ route, navigation }){
             </TouchableOpacity>
           </View>
         </View>
-        
-        {
-          usData == null ? 
-        <>
         <Button
           onPress = {() => handleNavigation()}
           buttonStyle={styles.buttonStyle}
           titleStyle={styles.buttonText}
           title="Estacionei!!"
         />
-
-        </>
-          :
-        <>
-        </>
-        }
         <Button
           onPress = {() => handleBack()}
           buttonStyle={styles.buttonAttentionStyle}

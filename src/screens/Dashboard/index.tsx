@@ -70,20 +70,28 @@ export function Dashboard({ navigation }){
   var intervalIdData;
 
   function getData(){
-    getDBAllPlaces().then(function(result){
-      getLocation(result);
-      if(intervalIdData == 0)
-        intervalIdData = setIntervalLocation();
-      checkExistReservation();
-      setIsLoading(false);
-    });
+    // checkTerm().then(function(result1){
+      // if(result1){
+        getDBAllPlaces().then(function(result){
+          getLocation(result);
+          if(intervalIdData == 0)
+            intervalIdData = setIntervalLocation();
+          checkExistReservation();
+          setIsLoading(false);
+        });
+      // }
+    // });
   }
   function getDataInterval(){
-    getDBAllPlaces().then(function(result){
-      getLocation(result);
-      checkExistReservation();
-      setIsLoading(false);
-    });
+    // checkTerm().then(function(result1){
+      // if(result1){
+        getDBAllPlaces().then(function(result){
+          getLocation(result);
+          checkExistReservation();
+          setIsLoading(false);
+        });
+      // }
+    // });
   }
   function checkExistReservation(){
     getReserveSpot().then(function(result : ParkData){

@@ -98,7 +98,7 @@ export function ChangePassword({ route, navigation }){
       <ContentView>
         <ContentViewInput>        
           <TextInput
-            placeholder="Senha"
+            placeholder="Senha Atual"
             onChangeText={text => setPassword(text)}
             style={styles.inputs}
             secureTextEntry={true}

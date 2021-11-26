@@ -133,21 +133,8 @@ export async function checkDataLogin(email : string, password : string){
 }
 
 export async function checkUserData(){
-  var returnData :  UserData;
-  returnData = {
-    id : "",
-    plate : "",
-    user : "",
-    car : "",
-    password : "",
-    email : ""
-  }
   var returnDataJSON = await AsyncStorage.getItem(userId);
-  if(returnDataJSON != null){
-    returnData = JSON.parse(returnDataJSON);
-    return returnData;
-  }else
-    return null;
+  return JSON.parse(returnDataJSON);
 }
 export async function logouts(){
   await AsyncStorage.removeItem(userId);
@@ -199,12 +186,13 @@ export async function checkTerm(){
   var accepts = { accept : true};
   var returnDataJSON = await AsyncStorage.getItem(userTermId);
   if(!returnDataJSON){      
-    if(Platform.OS !== 'ios') {
-      const granted = await Location.requestForegroundPermissionsAsync();
-      if (granted.granted) {
-        await AsyncStorage.setItem(userTermId, JSON.stringify(accepts))
-      }
-    }
+      Alert.alert(
+        "Termo de utilização de dados de veículos",
+        "O EstacionAqui trabalha com um sistema de leituras de placas de carros, para melhor reconhecimento e funcionamento do sistema, com isso, soliecitação a permissão para ler a placa de seu veiculo enquanto utiliza o sistema, para que possamos garantir que você não perca sua vaga  durante a ida até o estabelecimento!!!",
+        [
+          { text: "Concordo", onPress: function(){ AsyncStorage.setItem(userTermId, JSON.stringify(accepts)); return true} }
+        ]
+      );
   }
 }
 export async function saveHistory(places : TravelData){

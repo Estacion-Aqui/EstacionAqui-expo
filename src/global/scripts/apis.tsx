@@ -144,20 +144,28 @@ export async function lastTravels(usId : String){
 export async function checkLogin(emails : string, password: string){
     try {
         // var resp = await api.post('/checkLogin', ({email: emails, password: password}));
-        var resp = await api.post('/users/checkLogin', {email: emails, password : password});
+        var resp = await api.post('/users', {email: emails, password : password});
         console.log('resp'+resp.data);
         return resp.data;
     } catch (error) {
         console.log(error);
     }   
-    return null;
+    return {};
 }
 export async function sendUserData(us : UserData){
     try {
-        // var resp = await api.post((us.id ? '/updateData' : '/insertData'), JSON.stringify(us));
-        var resp = await api.post((us.id ? `/users/${us.id}` : '/users'), JSON.stringify(us));
-        console.log('resp'+resp.data);
-        return resp.data;
+        console.log(us);
+        console.log( JSON.stringify(us));
+        let jsonzada = {user:us.user,car:us.car,email:us.email,password:us.password,plate:us.plate};
+        if(us.id == ''){
+            var resp = await api.post('/users', jsonzada);
+            console.log('resp'+resp.data);
+            return resp.data;
+        }else{
+            var resp = await api.post(`/users/${us.id}`, jsonzada);
+            console.log('resp'+resp.data);
+            return resp.data;
+        }
     } catch (error) {
         console.log(error);
     }   
@@ -196,11 +204,14 @@ export async function reserveSpot(parkId : string){
         // var resp = await api.get(`/reserveSpot?user=${usId}&parkId=${parkId}`);
         var resp = await api.get(`/spots/free/${parkId}`);
 
-        console.log(resp.data?.sector);
+        console.log(resp.data);
         
         let sectorID = resp.data?.sector ? resp.data?.sector : '';
 
         var respSector = await api.get(`/sectors/${sectorID}`);
+
+        console.log('sectorID'+sectorID );
+        console.log('resp.data'+resp.data );
 
         respData.id = resp.data?.id;
         respData.spotId = resp.data.message ? null : resp.data?.title;
@@ -225,7 +236,7 @@ export async function checkSpot(spotId : String){
     } catch (error) {
         console.log(error);
     }   
-    return null;
+    return {};
 }
 export async function spotData(endpoint : string){
     try {

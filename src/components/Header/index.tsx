@@ -57,7 +57,7 @@ export function Header(){
             /> */}
             <User>
               <UserGreeting>Olá,</UserGreeting>
-              <UserName>{usData == null ? 'Visitante' : usData.name}</UserName>
+              <UserName>{usData == null ? 'Visitante' : usData.user}</UserName>
             </User>
           </UserInfo>
           <LogoutButton onPress={() => {}}>
